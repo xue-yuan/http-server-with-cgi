@@ -11,6 +11,12 @@
 #include <sys/socket.h>
 #include <netinet/in.h> 
 #include <arpa/inet.h>
+#include <sys/un.h>
+
+#define PORT 5278
+#define IP "127.0.0.1"
+#define MAX_REQUEST_LEN 1000
+#define UNIX_SOCK_PATH "/tmp/cgi.sock"
 
 int build_socket();
 void start_server(int);

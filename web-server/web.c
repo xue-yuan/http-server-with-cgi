@@ -44,8 +44,6 @@ void start_server(int serverfd) {
         Request *p_request = parse_request(request);
         Response *p_response = process(p_request);
         send(clientfd, p_response->response, strlen(p_response->response), 0);
-        print_request(p_request);
-        print_response(p_response);
         free_request(p_request);
         free_response(p_response);
         close(clientfd);
@@ -68,7 +66,30 @@ Response *process(Request *p_request) {
         p_response = process_static(p_request, ext);
     } else {
         // CGI Interface
-        // strcpy(info->argument, p_request->uri + 1);
+        int unixfd = 0;
+        int buffer_len = 0;
+        char buffer[MAX_REQUEST_LEN];
+
+        if ((unixfd = socket(AF_UNIX, SOCK_STREAM, 0)) < 0) {
+            // error
+        }
+
+        struct sockaddr_un cgiAddr;
+        bzero(&cgiAddr, sizeof(cgiAddr));
+        cgiAddr.sun_family = AF_UNIX;
+        strcpy(cgiAddr.sun_path, UNIX_SOCK_PATH);
+
+        if (connect(unixfd, (struct sockaddr *)&cgiAddr, sizeof(cgiAddr)) < 0) {
+            // error
+        }
+
+        send(unixfd, p_request->uri + 1, strlen(p_request->uri + 1), 0);
+        buffer_len = recv(unixfd, buffer, MAX_REQUEST_LEN, 0);
+        buffer[buffer_len] = 0;
+        printf("MSG: %s", buffer);
+
+        close(unixfd);
+        exit(1);
     }
 
     return p_response;

@@ -15,6 +15,7 @@
 // For Content type
 #define C_HTML "text/html"
 #define C_JPEG "image/jpeg"
+#define C_PNG "image/png"
 #define C_JSON "application/json"
 #define C_PDF "application/pdf"
 #define C_DEFAULT "text/plain"

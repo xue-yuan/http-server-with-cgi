@@ -37,6 +37,10 @@ Response *process_static(Request *p_request, char *ext) {
         p_response->content_type = (char *)malloc(strlen(C_JPEG) + 1);
         strcpy(p_response->content_type, C_JPEG);
         p_response->content_type[strlen(C_JPEG)] = '\0';
+    } else if (!strcmp(ext, "png")) {
+        p_response->content_type = (char *)malloc(strlen(C_PNG) + 1);
+        strcpy(p_response->content_type, C_PNG);
+        p_response->content_type[strlen(C_PNG)] = '\0';
     } else if (!strcmp(ext, "json")) {
         p_response->content_type = (char *)malloc(strlen(C_JSON) + 1);
         strcpy(p_response->content_type, C_JSON);

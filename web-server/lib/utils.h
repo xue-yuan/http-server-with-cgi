@@ -5,10 +5,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define PORT 5278
-#define IP "127.0.0.1"
-#define MAX_REQUEST_LEN 1000
-
 extern const char *BASE_DIR;
 extern const char *STATIC_DIR;
 extern const char *BACKEND_DIR;
