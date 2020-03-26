@@ -1,1 +1,6 @@
 host
+.DS_Store
+static/.DS_Store
+a.out
+cgid
+hostd

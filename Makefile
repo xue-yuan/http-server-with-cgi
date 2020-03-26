@@ -1,16 +1,16 @@
-all: web
+all: webc cgic
 
-web:
-	gcc web-server/web.c web-server/lib/*.c -o host 
+webc:
+	gcc -Wall web-server/web.c web-server/lib/*.c -o hostd 
 
-cgi:
-	gcc cgi/cgi.c -o scgi 
+cgic:
+	gcc -Wall cgi/cgi.c cgi/backend/*.c -o cgid 
 
 test: web-test cgi-test
 
-web-test: web web-run
+web-test: webc web-run
 
-cgi-test: cgi cgi-run
+cgi-test: cgic cgi-run
 
 web-run:
 	@./host
@@ -19,4 +19,4 @@ cgi-run:
 	@./scgi
 
 clean:
-	rm -rf host scgi
+	rm -rf hostd cgid a.out
