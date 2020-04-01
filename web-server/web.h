@@ -12,15 +12,23 @@
 #include <netinet/in.h> 
 #include <arpa/inet.h>
 #include <sys/un.h>
+#include <pthread.h>
 
 #define PORT 5278
 #define IP "127.0.0.1"
-#define MAX_REQUEST_LEN 1000
+#define MAX_BUFFER_LEN 1024
+#define MAX_CGI_LEN 32768
 #define UNIX_SOCK_PATH "/tmp/cgi.sock"
 
-int build_socket();
-void start_server(int);
-void error_handle(int);
+typedef struct Info {
+    int *sockfd;
+} Info;
+
+void start_server();
+void *thread_process(void *);
+void handle_signal(int);
+void client_leave(int);
+void client_nonexist(int);
 // To determine the path is requesting static file or not.
 Response *process(Request *);
 
