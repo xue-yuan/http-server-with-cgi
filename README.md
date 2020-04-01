@@ -1,9 +1,18 @@
-# Future update
+# Simple Web Server with CGI Interface
 
-- Error handle
-- Multithread
-- cgi
-- signal handle
-- pdf, jpg, png
-- fprintf, perror, unlink
-- keep-alive
+## Feature
+
+- HTTP/1.1
+- GET
+- Serving Static File.
+
+## Future update
+
+- [ ] POST
+- [ ] Keep-Alive
+- [x] MultiThread
+- [ ] Error Handling
+- [x] Signal Handling
+- [ ] Static File: JPG, PNG, PDF
+- [ ] Read/Write?
+- [ ] Dynamic allocate recv buffer
