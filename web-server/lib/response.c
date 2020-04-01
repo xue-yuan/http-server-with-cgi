@@ -29,40 +29,10 @@ Response *process_static(Request *p_request, char *ext) {
         sprintf(p_response->header, "%s %d %s", version, status_code, S_404);
     }
 
-    if (!strcmp(ext, "html")) {
-        p_response->content_type = (char *)malloc(strlen(C_HTML) + 1);
-        strcpy(p_response->content_type, C_HTML);
-        p_response->content_type[strlen(C_HTML)] = '\0';
-    } else if (!strcmp(ext, "jpg")) {
-        p_response->content_type = (char *)malloc(strlen(C_JPEG) + 1);
-        strcpy(p_response->content_type, C_JPEG);
-        p_response->content_type[strlen(C_JPEG)] = '\0';
-    } else if (!strcmp(ext, "png")) {
-        p_response->content_type = (char *)malloc(strlen(C_PNG) + 1);
-        strcpy(p_response->content_type, C_PNG);
-        p_response->content_type[strlen(C_PNG)] = '\0';
-    } else if (!strcmp(ext, "json")) {
-        p_response->content_type = (char *)malloc(strlen(C_JSON) + 1);
-        strcpy(p_response->content_type, C_JSON);
-        p_response->content_type[strlen(C_JSON)] = '\0';
-    } else if (!strcmp(ext, "pdf")) {
-        p_response->content_type = (char *)malloc(strlen(C_PDF) + 1);
-        strcpy(p_response->content_type, C_PDF);
-        p_response->content_type[strlen(C_PDF)] = '\0';
-    } else {
-        p_response->content_type = (char *)malloc(strlen(C_DEFAULT) + 1);
-        strcpy(p_response->content_type, C_DEFAULT);
-        p_response->content_type[strlen(C_DEFAULT)] = '\0';
-    }
-
-    p_response->date = (char *)malloc(30);
-    time_t now = time(0);
-    struct tm tm = *gmtime(&now);
-    strftime(p_response->date, 30, "%a, %d %b %Y %H:%M:%S", &tm);
-    p_response->date[30] = '\0';
-
-    p_response->server = "nginx/1.11.8";
-    p_response->connection = "Close";
+    p_response->content_type = set_content_type(ext);
+    p_response->date = set_date();
+    p_response->server = set_server();
+    p_response->connection = set_connection();
     p_response->body = set_body(status_code, file_path);
 
     build_response(p_response);
@@ -70,6 +40,88 @@ Response *process_static(Request *p_request, char *ext) {
     free(file_path);
 
     return p_response;
+}
+
+Response *process_dynamic(Request *p_request, char *template) {
+    int status_code = 0;
+    char *version = (char *)malloc(strlen(p_request->version) + 1);
+    Response *p_response = (Response *)malloc(sizeof(Response));
+
+    strcpy(version, p_request->version);
+
+    if (0) {
+        status_code = 301;
+        p_response->header = (char *)malloc(strlen(version) + strlen(S_301) + 6);
+        sprintf(p_response->header, "%s %d %s", version, status_code, S_301);
+    } else if (template != NULL) {
+        status_code = 200;
+        p_response->header = (char *)malloc(strlen(version) + strlen(S_200) + 6);
+        sprintf(p_response->header, "%s %d %s", version, status_code, S_200);
+    } else {
+        status_code = 404;
+        p_response->header = (char *)malloc(strlen(version) + strlen(S_404) + 6);
+        sprintf(p_response->header, "%s %d %s", version, status_code, S_404);
+    }
+
+    p_response->content_type = set_content_type("html");
+    p_response->date = set_date();
+    p_response->server = set_server();
+    p_response->connection = set_connection();
+    p_response->body = template;
+
+    build_response(p_response);
+    free(version);
+
+    return p_response;
+}
+
+char *set_content_type(char *ext) {
+    char *content_type = NULL;
+    if (!strcmp(ext, "html")) {
+        content_type = (char *)malloc(strlen(C_HTML) + 1);
+        strcpy(content_type, C_HTML);
+        content_type[strlen(C_HTML)] = '\0';
+    } else if (!strcmp(ext, "jpg")) {
+        content_type = (char *)malloc(strlen(C_JPEG) + 1);
+        strcpy(content_type, C_JPEG);
+        content_type[strlen(C_JPEG)] = '\0';
+    } else if (!strcmp(ext, "png")) {
+        content_type = (char *)malloc(strlen(C_PNG) + 1);
+        strcpy(content_type, C_PNG);
+        content_type[strlen(C_PNG)] = '\0';
+    } else if (!strcmp(ext, "json")) {
+        content_type = (char *)malloc(strlen(C_JSON) + 1);
+        strcpy(content_type, C_JSON);
+        content_type[strlen(C_JSON)] = '\0';
+    } else if (!strcmp(ext, "pdf")) {
+        content_type = (char *)malloc(strlen(C_PDF) + 1);
+        strcpy(content_type, C_PDF);
+        content_type[strlen(C_PDF)] = '\0';
+    } else {
+        content_type = (char *)malloc(strlen(C_DEFAULT) + 1);
+        strcpy(content_type, C_DEFAULT);
+        content_type[strlen(C_DEFAULT)] = '\0';
+    }
+
+    return content_type;
+}
+
+char *set_date() {
+    char *date = (char *)malloc(30);
+    time_t now = time(0);
+    struct tm tm = *gmtime(&now);
+    strftime(date, 30, "%a, %d %b %Y %H:%M:%S", &tm);
+    date[30] = '\0';
+
+    return date;
+}
+
+char *set_server() {
+    return "nginx/1.11.8";
+}
+
+char *set_connection() {
+    return "Close";
 }
 
 char *set_body(int status_code, char *file_path) {
@@ -120,8 +172,8 @@ void build_response(Response *p_response) {
 
 void free_response(Response *response) {
     if (response) {
-        if (response->body)
-            free(response->body);
+        // if (response->body)
+        //     free(response->body);
         // if (response->connection)
         //     free(response->connection);
         if (response->content_type)

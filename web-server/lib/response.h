@@ -38,6 +38,10 @@ typedef struct Response {
 
 Response *process_static(Request *, char *);
 Response *process_dynamic(Request *, char *);
+char *set_content_type(char *);
+char *set_date();
+char *set_server();
+char *set_connection();
 char *set_body(int, char *);
 void build_response(Response *);
 void free_response(Response *);
