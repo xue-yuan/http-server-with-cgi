@@ -5,10 +5,11 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define TEMPLATE_DIR "./cgi/backend/template"
+extern const char *TEMPLATE_DIR;
+extern const char *EXTENSION;
 
-void self_index();
-void upload();
-void view();
+char *self_index();
+char *upload();
+char *view();
 
 #endif

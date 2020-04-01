@@ -7,6 +7,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-void router(char *);
+char *router(char *);
 
 #endif
