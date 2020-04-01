@@ -1,10 +1,10 @@
 all: webc cgic
 
 webc:
-	gcc -Wall web-server/web.c web-server/lib/*.c -o hostd 
+	gcc -Wall web-server/web.c web-server/lib/*.c -o hostd -lpthread
 
 cgic:
-	gcc -Wall cgi/cgi.c cgi/backend/*.c -o cgid 
+	gcc -Wall cgi/cgi.c cgi/backend/*.c -o cgid -lpthread
 
 test: web-test cgi-test
 
