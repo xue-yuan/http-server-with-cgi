@@ -36,41 +36,41 @@ Request *parse_request(char *raw_request) {
     request->version[version_len] = '\0';
     raw_request += version_len + 2;
 
-    Header *header = NULL;
+    Header *headers = NULL;
     Header *next_header = NULL;
     while (raw_request[0]!='\r' && raw_request[1]!='\n') {
-        next_header = header;
-        header = (Header *)malloc(sizeof(Header));
-        if (!header) {
+        next_header = headers;
+        headers = (Header *)malloc(sizeof(Header));
+        if (!headers) {
             free_request(request);
             return NULL;
         }
 
         size_t name_len = strcspn(raw_request, ":");
-        header->name = (char *)malloc(name_len + 1);
-        if (!header->name) {
+        headers->name = (char *)malloc(name_len + 1);
+        if (!headers->name) {
             free_request(request);
             return NULL;
         }
-        memcpy(header->name, raw_request, name_len);
-        header->name[name_len] = '\0';
+        memcpy(headers->name, raw_request, name_len);
+        headers->name[name_len] = '\0';
         raw_request += name_len + 2;
 
         size_t value_len = strcspn(raw_request, "\r\n");
-        header->value = (char *)malloc(value_len + 1);
-        if (!header->value) {
+        headers->value = (char *)malloc(value_len + 1);
+        if (!headers->value) {
             free_request(request);
             return NULL;
         }
-        memcpy(header->value, raw_request, value_len);
-        header->value[value_len] = '\0';
+        memcpy(headers->value, raw_request, value_len);
+        headers->value[value_len] = '\0';
         raw_request += value_len + 2;
-        header->next_header = next_header;
+        headers->next_header = next_header;
     }
-    request->headers = header;
+    request->headers = headers;
     raw_request += 2;
 
-    size_t body_len = sizeof(raw_request);
+    size_t body_len = strlen(raw_request);
     request->body = (char *)malloc(body_len + 1);
     memcpy(request->body, raw_request, body_len);
     request->body[body_len] = '\0';

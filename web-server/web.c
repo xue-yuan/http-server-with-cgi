@@ -83,7 +83,7 @@ void start_server() {
 void *thread_process(void *arg) {
     int sockfd = *(int *)arg;
     int receive_size = 0;
-    char path_request[MAX_BUFFER_LEN]; // TODO: Use dynamic allocate.
+    char path_request[MAX_BUFFER_LEN];
 
     LOG_INFO("Client Connected");
 
@@ -91,8 +91,6 @@ void *thread_process(void *arg) {
         path_request[receive_size] = '\0';
         Request *p_request = parse_request(path_request);
         Response *p_response = process(p_request);
-        // printf("Body: %s\n", p_response->response);
-
         send(sockfd, p_response->response, strlen(p_response->response), 0);
         free_request(p_request);
         free_response(p_response);
@@ -123,16 +121,24 @@ Response *process(Request *p_request) {
     } else {
         int received_bytes = 0;
         char buffer[MAX_CGI_LEN];
+        char *info = (char *)malloc(strlen(p_request->uri) + strlen(p_request->body) + 2);
+        strcpy(info, p_request->uri);
+        strcat(info, ";");
+        strcat(info, p_request->body);
+        info[strlen(p_request->uri) + strlen(p_request->body) + 1] = '\0';
 
-        if (send(unixfd, p_request->uri, strlen(p_request->uri), 0) == -1) {
+        if (send(unixfd, info, strlen(info), 0) == -1) {
             LOG_FAILED("SendError.");
             perror("Unix Socket Send");
         }
 
         received_bytes = recv(unixfd, buffer, MAX_CGI_LEN, 0);
         buffer[received_bytes] = '\0';
-        // printf("CGI: %s\n", buffer);
+        if (received_bytes <= 1) {
+
+        }
         p_response = process_dynamic(p_request, buffer);
+        free(info);
     }
 
     return p_response;

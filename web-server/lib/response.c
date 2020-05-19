@@ -13,31 +13,32 @@ Response *process_static(Request *p_request, char *ext) {
     strcpy(version, p_request->version);
     strcpy(file_path, STATIC_DIR);
     strcat(file_path, p_request->uri);
-    file_path[strlen(STATIC_DIR) + strlen(p_request->uri)] = '\0';
 
     if (0) {
         status_code = 301;
         p_response->header = (char *)malloc(strlen(version) + strlen(S_301) + 6);
         sprintf(p_response->header, "%s %d %s", version, status_code, S_301);
+        p_response->header[strlen(version) + strlen(S_301) + 5] = '\0';
     } else if (access(file_path, F_OK) != -1) {
         status_code = 200;
         p_response->header = (char *)malloc(strlen(version) + strlen(S_200) + 6);
         sprintf(p_response->header, "%s %d %s", version, status_code, S_200);
+        p_response->header[strlen(version) + strlen(S_200) + 5] = '\0';
     } else {
         status_code = 404;
         p_response->header = (char *)malloc(strlen(version) + strlen(S_404) + 6);
         sprintf(p_response->header, "%s %d %s", version, status_code, S_404);
+        p_response->header[strlen(version) + strlen(S_404) + 5] = '\0';
     }
 
     p_response->content_type = set_content_type(ext);
-    p_response->date = set_date();
-    p_response->server = set_server();
     p_response->connection = set_connection();
     p_response->body = set_body(status_code, file_path);
 
     build_response(p_response);
     free(version);
     free(file_path);
+    free(ext);
 
     return p_response;
 }
@@ -64,10 +65,13 @@ Response *process_dynamic(Request *p_request, char *template) {
     }
 
     p_response->content_type = set_content_type("html");
-    p_response->date = set_date();
-    p_response->server = set_server();
     p_response->connection = set_connection();
-    p_response->body = template;
+
+    if (!strcmp(template, "")) {
+        p_response->body = set_body(status_code, NULL);
+    } else {
+        p_response->body = template;
+    }
 
     build_response(p_response);
     free(version);
@@ -121,7 +125,7 @@ char *set_server() {
 }
 
 char *set_connection() {
-    return "Close";
+    return "keep-alive";
 }
 
 char *set_body(int status_code, char *file_path) {
@@ -160,11 +164,9 @@ void build_response(Response *p_response) {
     p_response->response = (char *)malloc(1000);
     sprintf(
         p_response->response, 
-        "%s\r\nContent-Type: %s; charset=utf-8\r\nDate: %s GMT\r\nServer: %s\r\nConnection: %s\r\n\r\n%s",
+        "%s\r\nContent-Type: %s; charset=utf-8\r\nConnection: %s\r\n\r\n%s",
         p_response->header, 
         p_response->content_type, 
-        p_response->date, 
-        p_response->server, 
         p_response->connection, 
         p_response->body
     );
@@ -178,8 +180,8 @@ void free_response(Response *response) {
         //     free(response->connection);
         if (response->content_type)
             free(response->content_type);
-        if (response->date)
-            free(response->date);
+        // if (response->date)
+        //     free(response->date);
         if (response->header)
             free(response->header);
         // if (response->server)
