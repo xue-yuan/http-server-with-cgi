@@ -58,16 +58,37 @@ void start_listen() {
 void *thread_process(void *arg) {
     int sockfd = *(int *)arg;
     int receive_size;
-    char path_request[MAX_LEN];
+    char *info = (char *)malloc(MAX_LEN);
+    // char path_request[MAX_LEN];
     char *body = NULL;
 
     printf("[Client Connected]\n");
 
-    while ((receive_size = recv(sockfd, path_request, MAX_LEN, 0))) {
-        path_request[receive_size] = '\0';
-        body = router(path_request);
-        send(sockfd, body, strlen(body), 0);
-        memset(path_request, 0, strlen(path_request));
+    while ((receive_size = recv(sockfd, info, MAX_LEN, 0))) {
+        info[receive_size] = '\0';
+
+        size_t path_len = strcspn(info, ";");
+        char *path = (char *)malloc(path_len + 1);
+        memcpy(path, info, path_len);
+        path[path_len] = '\0';
+
+        size_t arg_len = strlen(info + path_len + 1);
+        char *arg = (char *)malloc(arg_len + 1);
+        strcpy(arg, info + path_len + 1);
+        arg[arg_len] = '\0';
+
+        printf("Path: %s\nArg: %s\n", path, arg);
+
+        body = router(path, arg);
+        // printf("Body: %s", body);
+        if (body != NULL) {
+            send(sockfd, body, strlen(body), 0);
+            free(body);
+        } else {
+            send(sockfd, "", 1, 0);
+        }
+
+        memset(info, 0, strlen(info));
     }
 
     if (receive_size == 0) {
@@ -77,6 +98,7 @@ void *thread_process(void *arg) {
         perror("<Recv>");
     }
     
+    free(info);
     // close(sockfd);
     return 0;
 }
@@ -85,8 +107,7 @@ void handle_signal(int signo){
     if (signo == SIGINT) {
         fprintf(stderr, "Signal: SIGINT(%d)\n", signo);
     } else if (signo == SIGTERM){
-        printf("SIGTERM\n");
-        fprintf(stderr, "received signal: SIGTERM(%d)\n", signo);
+        fprintf(stderr, "Signal: SIGTERM(%d)\n", signo);
     }
 
     close(serverfd);

@@ -1,13 +1,18 @@
 #include "router.h"
 
-char *router(char *arg) {
-    if ((!strcmp(arg, "/")) || !strcmp(arg, "/index") || !strcmp(arg, "/index\n")) {
-        return self_index();
-    } else if (!strcmp(arg, "/upload")) {
-        return upload();
-    } else if (!strcmp(arg, "/view")) {
-        return view();
+char *router(char *path, char *arg) {
+    // Parameter* parameter = NULL;
+    Parameter* parameter = argument_parse(arg);
+    
+    if ((!strcmp(path, "/")) || !strcmp(path, "/index") || !strcmp(path, "/index\n")) {
+        return self_index(parameter);
+    } else if (!strcmp(path, "/upload")) {
+        return upload(parameter);
+    } else if (!strcmp(path, "/view")) {
+        return view(parameter);
+    } else {
+        return NULL;
     }
 
-    return "";
+    return NULL;
 }
