@@ -4,7 +4,7 @@ webc:
 	gcc -Wall web-server/web.c web-server/lib/*.c -o hostd -lpthread
 
 cgic:
-	gcc -Wall cgi/cgi.c cgi/backend/*.c -o cgid -lpthread
+	gcc -Wall cgi/cgi.c cgi/backend/*.c cgi/backend/lib/*.c -o cgid -lpthread
 
 test: web-test cgi-test
 
