@@ -13,9 +13,10 @@
 #include <arpa/inet.h>
 #include <sys/un.h>
 #include <pthread.h>
+#include <signal.h>
 
 #define PORT 5278
-#define IP "127.0.0.1"
+#define IP "0.0.0.0"
 #define MAX_BUFFER_LEN 1024
 #define MAX_CGI_LEN 32768
 #define UNIX_SOCK_PATH "/tmp/cgi.sock"

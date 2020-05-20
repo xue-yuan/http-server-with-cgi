@@ -11,8 +11,8 @@ char *router(char *path, char *arg) {
     } else if (!strcmp(path, "/view")) {
         return view(parameter);
     } else {
-        return NULL;
+        return self_index(parameter);
     }
 
-    return NULL;
+    return self_index(parameter);
 }

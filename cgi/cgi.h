@@ -14,6 +14,7 @@
 #include <unistd.h>
 #include <sys/stat.h>
 #include <pthread.h>
+#include <signal.h>
 
 #define UNIX_SOCK_PATH "/tmp/cgi.sock"
 #define MAX_LEN 1000
